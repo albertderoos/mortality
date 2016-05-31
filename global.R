@@ -1,0 +1,1 @@
+graphdata <- readRDS(file="mortdata.Rda") 

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>A simple app to study mortality data</title>
+  <meta charset="utf-8">
+  <meta name="description" content="A simple app to study mortality data">
+  <meta name="author" content="Albert de Roos">
+  <meta name="generator" content="slidify" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/default.css" media="all" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/phone.css" 
+    media="only screen and (max-device-width: 480px)" >
+  <link rel="stylesheet" href="libraries/frameworks/io2012/css/slidify.css" >
+  <link rel="stylesheet" href="libraries/highlighters/highlight.js/css/tomorrow.css" />
+  <base target="_blank"> <!-- This amazingness opens all links in a new tab. -->  <link rel=stylesheet href="./assets/css/ribbons.css"></link>
+
+  
+  <!-- Grab CDN jQuery, fall back to local if offline -->
+  <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.min.js"></script>
+  <script>window.jQuery || document.write('<script src="libraries/widgets/quiz/js/jquery.js"><\/script>')</script> 
+  <script data-main="libraries/frameworks/io2012/js/slides" 
+    src="libraries/frameworks/io2012/js/require-1.0.8.min.js">
+  </script>
+  
+  
+
+</head>
+<body style="opacity: 0">
+  <slides class="layout-widescreen">
+    
+    <!-- LOGO SLIDE -->
+        <slide class="title-slide segue nobackground">
+  <hgroup class="auto-fadein">
+    <h1>A simple app to study mortality data</h1>
+    <h2>A shiny showcase</h2>
+    <p>Albert de Roos<br/>Coursera Data Science Student</p>
+  </hgroup>
+  <article></article>  
+</slide>
+    
+
+    <!-- SLIDES -->
+    <slide class="" id="slide-1" style="background:;">
+  <hgroup>
+    <h2>Background and Rationale</h2>
+  </hgroup>
+  <article data-timings="">
+    <h3>Mortality data</h3>
+
+<ul>
+<li>the World Health Organization publishes mortality data for a large number of countries over the last 50 years</li>
+<li>this mortality data gives insight in the causes of death and the differences in regions leading to better insight in the causes of disease</li>
+<li>a good graphical presentation of this dat can help in visualizing mortality trends</li>
+</ul>
+
+<h3>A shiny app for mortality data</h3>
+
+<ul>
+<li>we developed a proof-of-concept for visualing the mortality trends using a shiny app</li>
+<li>here we show the R code and shiny server and ui code that was used</li>
+<li>we show a simple app where the user can select the year and the mortality-age group distrbution is show</li>
+</ul>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Shiny ui.R</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>We used a simple layout with header, sidebar and main panels</li>
+<li>We used a simple slider to indicate the year to display</li>
+<li>Code is abbreviated and more text is shown in the app itself</li>
+</ul>
+
+<pre><code class="r">shinyUI(pageWithSidebar(
+     headerPanel(&#39;Pharynx Cancer Mortality Data From Hungary&#39;),
+     sidebarPanel(
+          p(&quot;Use the slider to see the different mortality rate distribution&quot;),
+          sliderInput(&quot;year&quot;, &quot;Choose the year:&quot;, min=1955, max=2012, value=1995, sep = &quot;&quot;)),
+     mainPanel(
+          p(&quot;Explanatory text here&quot;),
+          plotOutput(&#39;plot1&#39;)
+     )
+))
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>Shiny server.R and global.R code</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>Server code used a ggplot2 grap based on the input year</li>
+<li>We needed an extra file global.R to download the data (not shown)</li>
+<li>The original mortality files contained data on pharynx cancer per year and per age group.</li>
+<li>The input data was melted using dplyr to get tidy data as input for the app.</li>
+</ul>
+
+<pre><code class="r">shinyServer(function(input, output, session) {
+
+     output$plot1 &lt;- renderPlot({
+          graph &lt;- graphdata[graphdata$Year == input$year, 2:3]
+          ggplot(data=graph, aes(x=AgeGroup, y=MortRate, group = 1)) +
+               ggtitle(&quot;Hungary: Mortality Rates by Age Group&quot;) + xlab(&quot;Age Group&quot;) + 
+               ylab(&quot;Mortality Rate&quot;) +
+               geom_point() +
+               geom_line() +
+               theme(axis.text.x = element_text(angle = 45)) +
+               ylim(0,120)
+     })
+})
+</code></pre>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+<slide class="class" id="id" style="background:;">
+  <hgroup>
+    <h2>The Result: The Mortality Data App</h2>
+  </hgroup>
+  <article data-timings="">
+    <ul>
+<li>App can be seen live here <a href="https://albertderoos.shinyapps.io/MortApp/">https://albertderoos.shinyapps.io/MortApp/</a></li>
+<li>Example graph below for the year 1955 and 1997 </li>
+</ul>
+
+<p><img src="figure/graph_output%60-1.png" alt="plot of chunk graph_output`"></p>
+
+  </article>
+  <!-- Presenter Notes -->
+</slide>
+
+    <slide class="backdrop"></slide>
+  </slides>
+  <div class="pagination pagination-small" id='io2012-ptoc' style="display:none;">
+    <ul>
+      <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=1 title='Background and Rationale'>
+         1
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=2 title='Shiny ui.R'>
+         2
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=3 title='Shiny server.R and global.R code'>
+         3
+      </a>
+    </li>
+    <li>
+      <a href="#" target="_self" rel='tooltip' 
+        data-slide=4 title='The Result: The Mortality Data App'>
+         4
+      </a>
+    </li>
+  </ul>
+  </div>  <!--[if IE]>
+    <script 
+      src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">  
+    </script>
+    <script>CFInstall.check({mode: 'overlay'});</script>
+  <![endif]-->
+</body>
+  <!-- Load Javascripts for Widgets -->
+  
+  <!-- LOAD HIGHLIGHTER JS FILES -->
+  <script src="libraries/highlighters/highlight.js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <!-- DONE LOADING HIGHLIGHTER JS FILES -->
+   
+  </html>

@@ -1,0 +1,100 @@
+---
+title       : A simple app to study mortality data
+subtitle    : A shiny showcase
+author      : Albert de Roos
+job         : Coursera Data Science Student
+framework   : io2012      # {io2012, html5slides, shower, dzslides, ...}
+highlighter : highlight.js  # {highlight.js, prettify, highlight}
+hitheme     : tomorrow      # 
+widgets     : []            # {mathjax, quiz, bootstrap}
+mode        : selfcontained # {standalone, draft}
+knit        : slidify::knit2slides
+
+---
+
+## Background and Rationale
+
+### Mortality data
+- the World Health Organization publishes mortality data for a large number of countries over the last 50 years
+- this mortality data gives insight in the causes of death and the differences in regions leading to better insight in the causes of disease
+- a good graphical presentation of this dat can help in visualizing mortality trends
+
+### A shiny app for mortality data
+- we developed a proof-of-concept for visualing the mortality trends using a shiny app
+- here we show the R code and shiny server and ui code that was used
+- we show a simple app where the user can select the year and the mortality-age group distrbution is show
+
+--- .class #id 
+
+```{r imports, echo=FALSE, warning=FALSE, message=FALSE}
+library(dplyr)
+graphdata <- readRDS(file="mortdata.Rda") 
+
+```
+
+## Shiny ui.R
+
+- We used a simple layout with header, sidebar and main panels
+- We used a simple slider to indicate the year to display
+- Code is abbreviated and more text is shown in the app itself
+
+```{r code, eval=FALSE}
+shinyUI(pageWithSidebar(
+     headerPanel('Pharynx Cancer Mortality Data From Hungary'),
+     sidebarPanel(
+          p("Use the slider to see the different mortality rate distribution"),
+          sliderInput("year", "Choose the year:", min=1955, max=2012, value=1995, sep = "")),
+     mainPanel(
+          p("Explanatory text here"),
+          plotOutput('plot1')
+     )
+))
+```
+
+--- .class #id 
+
+## Shiny server.R and global.R code
+- Server code used a ggplot2 grap based on the input year
+- We needed an extra file global.R to download the data (not shown)
+- The original mortality files contained data on pharynx cancer per year and per age group.
+- The input data was melted using dplyr to get tidy data as input for the app.
+
+```{r server, eval=FALSE}
+
+shinyServer(function(input, output, session) {
+
+     output$plot1 <- renderPlot({
+          graph <- graphdata[graphdata$Year == input$year, 2:3]
+          ggplot(data=graph, aes(x=AgeGroup, y=MortRate, group = 1)) +
+               ggtitle("Hungary: Mortality Rates by Age Group") + xlab("Age Group") + 
+               ylab("Mortality Rate") +
+               geom_point() +
+               geom_line() +
+               theme(axis.text.x = element_text(angle = 45)) +
+               ylim(0,120)
+     })
+})
+```
+
+--- .class #id 
+
+## The Result: The Mortality Data App
+- App can be seen live here https://albertderoos.shinyapps.io/MortApp/
+- Example graph below for the year 1955 and 1997 
+
+```{r graph_output`, echo=FALSE}
+library(ggplot2)
+graph <- graphdata[graphdata$Year == 1997, 2:3]
+          ggplot(data=graph, aes(x=AgeGroup, y=MortRate, group = 1)) +
+               ggtitle("Hungary: Mortality Rates by Age Group") + xlab("Age Group") +
+               ylab("Mortality Rate") +
+               geom_point() +
+               geom_line() +
+               theme(axis.text.x = element_text(angle = 45)) +
+               ylim(0,120)
+
+```
+
+
+
+
